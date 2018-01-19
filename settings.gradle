@@ -1,0 +1,3 @@
+rootProject.name = 'graphql-kotlin-dsl'
+include 'graphql-kotlin-dsl'
+
