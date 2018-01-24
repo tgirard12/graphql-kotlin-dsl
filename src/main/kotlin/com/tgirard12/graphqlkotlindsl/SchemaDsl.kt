@@ -29,6 +29,12 @@ schema {
     ${if (mutations.isNotEmpty()) "mutations: MutattionType" else ""}
 }
 
+${if (queries.isNotEmpty())
+        """type QueryType {
+${queries.joinToString("\n") { it.schemaString() }}
+}
+ """
+    else ""}
 ${enums.joinToString { it.schemaString() }}
 ${types.joinToString { it.schemaString() }}
 """.trimEnd()
@@ -44,6 +50,13 @@ ${fields.joinToString("\n") { TAB + it.name }}
 }""".trim()
 
     private fun TypeDsl.Field.schemaString() = """$name: $type${if (!nullable) "!" else ""}"""
+
+    private fun QueryDsl.schemaString() = """$TAB$name${if (args.isNotEmpty()) {
+        "(${args.joinToString { it.schemaString() }})"
+    } else ""
+    }: $returnType${if (!returnTypeNullable) "!" else ""}"""
+
+    private fun QueryDsl.Arg.schemaString() = """$name: $type${if (!nullable) "!" else ""}"""
 
     /*
      * DSL
@@ -78,6 +91,39 @@ ${fields.joinToString("\n") { TAB + it.name }}
                         description = ""
                 )
             }
+        }
+    }
+
+    inline fun <reified T : Any> query(queryName: String? = null, f: QueryDsl.() -> Unit): Unit {
+        queries += QueryDsl().apply {
+            if (T::class.typeParameters.isNotEmpty())
+                throw IllegalArgumentException("""
+                    |Generic types like List<String> could not be reified du to JVM type erasure
+                    |You must set the type manually :
+                    |query<Unit>("myQuery") {
+                    |    returnType = "[String]"
+                    |    returnTypeNullable = true  // not nullable by default
+                    |}""".trimMargin())
+
+            f.invoke(this)
+            when {
+                queryName != null -> name = queryName
+                name == null -> name = T::class.gqlName()?.decapitalize()
+            }
+            returnType nullThen { returnType = T::class.gqlName() }
+        }
+    }
+
+    inline fun <reified T : Any?> QueryDsl.arg(argName: String? = null, f: QueryDsl.Arg.() -> Unit): Unit {
+        args += QueryDsl.Arg().apply {
+            f.invoke(this)
+
+            when {
+                argName != null -> name = argName
+                name == null -> name = T::class.gqlName().decapitalize()
+            }
+            type nullThen { type = T::class.gqlName() }
+            nullable nullThen { nullable = T::class.gqlName().contains("?") }
         }
     }
 
