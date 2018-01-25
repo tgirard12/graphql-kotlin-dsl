@@ -1,6 +1,6 @@
 package com.tgirard12.graphqlkotlindsl
 
-class QueryDsl {
+sealed class ActionDsl {
     var name: String? = null
     var description: String? = null
 
@@ -15,4 +15,7 @@ class QueryDsl {
         var type: String? = null
         var nullable: Boolean = false
     }
+
+    class QueryDsl : ActionDsl()
+    class MutationDsl : ActionDsl()
 }

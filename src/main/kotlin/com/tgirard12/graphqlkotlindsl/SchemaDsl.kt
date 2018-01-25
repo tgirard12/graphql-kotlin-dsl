@@ -1,5 +1,7 @@
 package com.tgirard12.graphqlkotlindsl
 
+import com.tgirard12.graphqlkotlindsl.ActionDsl.MutationDsl
+import com.tgirard12.graphqlkotlindsl.ActionDsl.QueryDsl
 import graphql.schema.GraphQLSchema
 import org.slf4j.LoggerFactory
 import kotlin.reflect.KClass
@@ -26,12 +28,18 @@ class SchemaDsl internal constructor() {
     fun schemaString() = """
 schema {
     ${if (queries.isNotEmpty()) "query: QueryType" else ""}
-    ${if (mutations.isNotEmpty()) "mutations: MutattionType" else ""}
+    ${if (mutations.isNotEmpty()) "mutation: MutationType" else ""}
 }
 
 ${if (queries.isNotEmpty())
         """type QueryType {
 ${queries.joinToString("\n") { it.schemaString() }}
+}
+ """
+    else ""}
+${if (mutations.isNotEmpty())
+        """type MutationType {
+${mutations.joinToString("\n") { it.schemaString() }}
 }
  """
     else ""}
@@ -51,12 +59,12 @@ ${fields.joinToString("\n") { TAB + it.name }}
 
     private fun TypeDsl.Field.schemaString() = """$name: $type${if (!nullable) "!" else ""}"""
 
-    private fun QueryDsl.schemaString() = """$TAB$name${if (args.isNotEmpty()) {
+    private fun ActionDsl.schemaString() = """$TAB$name${if (args.isNotEmpty()) {
         "(${args.joinToString { it.schemaString() }})"
     } else ""
     }: $returnType${if (!returnTypeNullable) "!" else ""}"""
 
-    private fun QueryDsl.Arg.schemaString() = """$name: $type${if (!nullable) "!" else ""}"""
+    private fun ActionDsl.Arg.schemaString() = """$name: $type${if (!nullable) "!" else ""}"""
 
     /*
      * DSL
@@ -114,8 +122,28 @@ ${fields.joinToString("\n") { TAB + it.name }}
         }
     }
 
-    inline fun <reified T : Any?> QueryDsl.arg(argName: String? = null, f: QueryDsl.Arg.() -> Unit): Unit {
-        args += QueryDsl.Arg().apply {
+    inline fun <reified T : Any> mutation(queryName: String? = null, f: MutationDsl.() -> Unit): Unit {
+        mutations += MutationDsl().apply {
+            if (T::class.typeParameters.isNotEmpty())
+                throw IllegalArgumentException("""
+                    |Generic types like List<String> could not be reified du to JVM type erasure
+                    |You must set the type manually :
+                    |mutation<Unit>("myQuery") {
+                    |    returnType = "[String]"
+                    |    returnTypeNullable = true  // not nullable by default
+                    |}""".trimMargin())
+
+            f.invoke(this)
+            when {
+                queryName != null -> name = queryName
+                name == null -> name = T::class.gqlName()?.decapitalize()
+            }
+            returnType nullThen { returnType = T::class.gqlName() }
+        }
+    }
+
+    inline fun <reified T : Any?> ActionDsl.arg(argName: String? = null, f: ActionDsl.Arg.() -> Unit): Unit {
+        args += ActionDsl.Arg().apply {
             f.invoke(this)
 
             when {
