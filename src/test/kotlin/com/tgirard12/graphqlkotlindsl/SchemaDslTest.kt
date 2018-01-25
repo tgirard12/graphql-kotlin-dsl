@@ -35,6 +35,8 @@ $TAB
 }
 
 
+
+
 type SimpleTypes {
     double: Double!
     doubleNull: Double
@@ -60,6 +62,8 @@ $TAB
 }
 
 
+
+
 type ListTypes {
     ints: [Int]!
     intsNull: [Int]
@@ -73,6 +77,8 @@ schema {
 $TAB
 $TAB
 }
+
+
 
 enum SimpleEnum {
     val1

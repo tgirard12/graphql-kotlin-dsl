@@ -21,6 +21,8 @@ $TAB
 }
 
 
+
+
 type SimpleTypes {
     double: Double!
     doubleNull: Double
@@ -44,6 +46,8 @@ schema {
 $TAB
 $TAB
 }
+
+
 
 
 type ListTypes {
