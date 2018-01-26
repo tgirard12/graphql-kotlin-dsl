@@ -1,5 +1,6 @@
 buildscript {
-    ext.kotlin_version = '1.2.20'
+    ext.kotlin_version = '1.2.21'
+    ext.graphql_java_version = '7.0'
 
     repositories {
         jcenter()
@@ -21,10 +22,11 @@ mainClassName = "com.tgirard12.graphqlkotlindsl.MainKt"
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "org.jetbrains.kotlin:kotlin-reflect"
-    compile "com.graphql-java:graphql-java:7.0"
     compile "ch.qos.logback:logback-classic:1.2.3"
+    compileOnly "com.graphql-java:graphql-java:$graphql_java_version"
 
     testCompile "io.kotlintest:kotlintest:1.3.7"
+    testCompile "com.graphql-java:graphql-java:$graphql_java_version"
 }
 
 repositories {
