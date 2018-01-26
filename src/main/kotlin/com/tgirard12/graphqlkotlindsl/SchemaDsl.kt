@@ -3,6 +3,9 @@ package com.tgirard12.graphqlkotlindsl
 import com.tgirard12.graphqlkotlindsl.ActionDsl.MutationDsl
 import com.tgirard12.graphqlkotlindsl.ActionDsl.QueryDsl
 import graphql.schema.GraphQLSchema
+import graphql.schema.idl.RuntimeWiring
+import graphql.schema.idl.SchemaGenerator
+import graphql.schema.idl.SchemaParser
 import org.slf4j.LoggerFactory
 import kotlin.reflect.KClass
 import kotlin.reflect.KClassifier
@@ -17,7 +20,10 @@ class SchemaDsl internal constructor() {
         private const val TAB = "    "
     }
 
-    var graphQLSchema: GraphQLSchema? = null
+    fun graphQLSchema(runtimeWiring: RuntimeWiring): GraphQLSchema =
+            SchemaParser().parse(schemaString()).let { typeRegistry ->
+                SchemaGenerator().makeExecutableSchema(typeRegistry, runtimeWiring)
+            }
 
     val queries = mutableListOf<QueryDsl>()
     val mutations = mutableListOf<MutationDsl>()
