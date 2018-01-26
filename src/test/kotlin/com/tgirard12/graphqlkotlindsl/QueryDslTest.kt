@@ -35,9 +35,9 @@ $TAB
 }
 
 type QueryType {
-    string: String!
     myString: String!
     simpleTypes: SimpleTypes!
+    string: String!
 }"""
             }
             "print nullable return type" {

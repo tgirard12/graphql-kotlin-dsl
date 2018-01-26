@@ -33,23 +33,23 @@ schema {
 
 ${if (queries.isNotEmpty())
         """type QueryType {
-${queries.joinToString("\n") { it.schemaString() }}
+${queries.sortedBy { it.name }.joinToString("\n") { it.schemaString() }}
 }
  """
     else ""}
 ${if (mutations.isNotEmpty())
         """type MutationType {
-${mutations.joinToString("\n") { it.schemaString() }}
+${mutations.sortedBy { it.name }.joinToString("\n") { it.schemaString() }}
 }
  """
     else ""}
-${enums.joinToString { it.schemaString() }}
-${types.joinToString { it.schemaString() }}
+${enums.sortedBy { it.name }.joinToString { it.schemaString() }}
+${types.sortedBy { it.name }.joinToString { it.schemaString() }}
 """.trimEnd()
 
     private fun TypeDsl.schemaString() = """
 type $name {
-${fields.joinToString("\n") { TAB + it.schemaString() }}
+${fields.sortedBy { it.name }.joinToString("\n") { TAB + it.schemaString() }}
 }""".trim()
 
     private fun EnumDsl.schemaString() = """
