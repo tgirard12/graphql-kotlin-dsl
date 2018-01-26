@@ -25,6 +25,7 @@ class SchemaDsl internal constructor() {
                 SchemaGenerator().makeExecutableSchema(typeRegistry, runtimeWiring)
             }
 
+    val scalars = mutableListOf<ScalarDsl>()
     val queries = mutableListOf<QueryDsl>()
     val mutations = mutableListOf<MutationDsl>()
     val types = mutableListOf<TypeDsl>()
@@ -37,7 +38,9 @@ schema {
     ${if (mutations.isNotEmpty()) "mutation: MutationType" else ""}
 }
 
-${if (queries.isNotEmpty())
+${if (scalars.isNotEmpty()) scalars.sortedBy { it.name }.joinToString("\n") { it.schemaString() } else ""}
+
+    ${if (queries.isNotEmpty())
         """type QueryType {
 ${queries.sortedBy { it.name }.joinToString("\n") { it.schemaString() }}
 }
@@ -63,6 +66,7 @@ enum $name {
 ${fields.joinToString("\n") { TAB + it.name }}
 }""".trim()
 
+    private fun ScalarDsl.schemaString() = """scalar $name"""
     private fun TypeDsl.Field.schemaString() = """$name: $type${if (!nullable) "!" else ""}"""
 
     private fun ActionDsl.schemaString() = """$TAB$name${if (args.isNotEmpty()) {
@@ -75,6 +79,12 @@ ${fields.joinToString("\n") { TAB + it.name }}
     /*
      * DSL
      */
+    inline fun <reified T : Any> scalar(): Unit {
+        scalars += ScalarDsl().apply {
+            name = T::class.gqlName()
+        }
+    }
+
     inline fun <reified T : Any> type(f: TypeDsl.() -> Unit): Unit {
         types += TypeDsl().apply {
             f.invoke(this)
