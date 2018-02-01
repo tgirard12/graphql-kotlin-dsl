@@ -2,10 +2,6 @@ package com.tgirard12.graphqlkotlindsl
 
 import com.tgirard12.graphqlkotlindsl.ActionDsl.MutationDsl
 import com.tgirard12.graphqlkotlindsl.ActionDsl.QueryDsl
-import graphql.schema.GraphQLSchema
-import graphql.schema.idl.RuntimeWiring
-import graphql.schema.idl.SchemaGenerator
-import graphql.schema.idl.SchemaParser
 import org.slf4j.LoggerFactory
 import kotlin.reflect.KClass
 import kotlin.reflect.KClassifier
@@ -20,11 +16,6 @@ class SchemaDsl internal constructor() {
         private const val TAB = "    "
         private const val NLINE = "\n"
     }
-
-    fun graphQLSchema(runtimeWiring: RuntimeWiring): GraphQLSchema =
-            SchemaParser().parse(schemaString()).let { typeRegistry ->
-                SchemaGenerator().makeExecutableSchema(typeRegistry, runtimeWiring)
-            }
 
     val scalars = mutableListOf<ScalarDsl>()
     val queries = mutableListOf<QueryDsl>()
@@ -202,7 +193,6 @@ ${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
         }
     }
 
-    // Extensions
     inline infix fun <T> T?.nullThen(f: () -> Unit) {
         if (this == null) f()
     }
