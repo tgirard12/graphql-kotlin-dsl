@@ -21,7 +21,7 @@ class GqlJavaExtentions {
 
                     GraphQLScalarType(name, description, coercing ?: object : Coercing<T, String> {
                         override fun parseValue(input: Any?): T = _parseValue(input)
-                        override fun parseLiteral(input: Any?): T = _parseLiteral(input)
+                        override fun parseLiteral(input: Any?): T? = _parseLiteral(input)
                         override fun serialize(dataFetcherResult: Any?): String = _serialize(dataFetcherResult)
                     })
                 }

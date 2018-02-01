@@ -10,7 +10,10 @@ class GqlJavaScalars {
         val uuid by lazy {
             GqlJavaExtentions.scalarTypeDsl<UUID> {
                 parseLiteral {
-                    TODO()
+                    when (it) {
+                        is String -> UUID.fromString(it)
+                        else -> null
+                    }
                 }
                 parseValue {
                     when (it) {
