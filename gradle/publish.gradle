@@ -1,0 +1,47 @@
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.kotlin
+    classifier "sources"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId project.group
+            artifactId project.name
+            version project.version
+
+            from components.java
+
+            artifact sourceJar
+        }
+    }
+}
+
+// Upload Bintray
+bintray {
+    user = bintrayUser
+    key = bintrayApiKey
+    publications = ['mavenJava']
+    override = false
+    publish = false
+    dryRun = false
+    pkg {
+        repo = bintray_repo
+        name = project.name
+        description = bintray_description
+        publicDownloadNumbers = true
+        licenses = ['Apache-2.0']
+        vcsUrl = bintray_vcsUrl
+        issueTrackerUrl = bintray_issueTrackerUrl
+        githubRepo = bintray_githubRepo
+        version {
+            name = project.version
+            desc = "v${project.version}"
+            released = new Date()
+            vcsTag = "v${project.name}"
+        }
+    }
+}
