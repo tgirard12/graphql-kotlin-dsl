@@ -16,12 +16,7 @@ class TypeDslTest : WordSpec() {
                     type<SimpleTypes> { }
                 } schemaEqual """
 schema {
-$TAB
-$TAB
 }
-
-
-
 
 type SimpleTypes {
     double: Double!
@@ -36,24 +31,21 @@ type SimpleTypes {
     stringNull: String
     uuid: UUID!
     uuidNull: UUID
-}"""
+}
+"""
             }
             "print List types" {
                 schemaDsl {
                     type<ListTypes> { }
                 } schemaEqual """
 schema {
-$TAB
-$TAB
 }
-
-
-
 
 type ListTypes {
     ints: [Int]!
     intsNull: [Int]
-}"""
+}
+"""
             }
         }
     }

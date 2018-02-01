@@ -12,14 +12,13 @@ class MutationDslTest : WordSpec() {
                     mutation<String> { }
                 } schemaEqual """
 schema {
-$TAB
     mutation: MutationType
 }
 
-
 type MutationType {
     string: String!
-}"""
+}
+"""
             }
             "print simple Type custom Name" {
                 schemaDsl {
@@ -28,16 +27,15 @@ type MutationType {
                     mutation<SimpleTypes> { name = "simpleTypes" }
                 } schemaEqual """
 schema {
-$TAB
     mutation: MutationType
 }
-
 
 type MutationType {
     myString: String!
     simpleTypes: SimpleTypes!
     string: String!
-}"""
+}
+"""
             }
             "print nullable return type" {
                 schemaDsl {
@@ -46,14 +44,13 @@ type MutationType {
                     }
                 } schemaEqual """
 schema {
-$TAB
     mutation: MutationType
 }
 
-
 type MutationType {
     myString: String
-}"""
+}
+"""
             }
         }
         "QueryDslTest with args" should {
@@ -64,14 +61,13 @@ type MutationType {
                     }
                 } schemaEqual """
 schema {
-$TAB
     mutation: MutationType
 }
 
-
 type MutationType {
     string(string: String!): String!
-}"""
+}
+"""
             }
             "several args and config" {
                 schemaDsl {
@@ -81,14 +77,13 @@ type MutationType {
                     }
                 } schemaEqual """
 schema {
-$TAB
     mutation: MutationType
 }
 
-
 type MutationType {
     string(string: String, type: SimpleTypes!): String!
-}"""
+}
+"""
             }
             "Custom Mutation Name" {
                 schemaDsl {
@@ -105,15 +100,14 @@ type MutationType {
                     }
                 } schemaEqual """
 schema {
-$TAB
     mutation: MutationType
 }
-
 
 type MutationType {
     myMutation(string: String): String!
     secondMutation(type: SimpleTypes!, count: Int): String!
-}"""
+}
+"""
             }
         }
         "MutationDslTest List Type" should {
@@ -135,15 +129,14 @@ type MutationType {
                     }
                 } schemaEqual """
 schema {
-$TAB
     mutation: MutationType
 }
-
 
 type MutationType {
     myMutation: [String]!
     myMutation2: [String]
-}"""
+}
+"""
             }
         }
     }

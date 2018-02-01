@@ -15,17 +15,14 @@ class EnumDslTest : WordSpec() {
                     enum<SimpleEnum> { }
                 } schemaEqual """
 schema {
-$TAB
-$TAB
 }
-
-
 
 enum SimpleEnum {
     val1
     VAL_2
     enum
-}"""
+}
+"""
             }
         }
     }

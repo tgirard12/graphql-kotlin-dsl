@@ -16,12 +16,12 @@ class QueryDslTest : WordSpec() {
                 } schemaEqual """
 schema {
     query: QueryType
-$TAB
 }
 
 type QueryType {
     string: String!
-}"""
+}
+"""
             }
             "print simple Type custom Name" {
                 schemaDsl {
@@ -31,14 +31,14 @@ type QueryType {
                 } schemaEqual """
 schema {
     query: QueryType
-$TAB
 }
 
 type QueryType {
     myString: String!
     simpleTypes: SimpleTypes!
     string: String!
-}"""
+}
+"""
             }
             "print nullable return type" {
                 schemaDsl {
@@ -48,12 +48,12 @@ type QueryType {
                 } schemaEqual """
 schema {
     query: QueryType
-$TAB
 }
 
 type QueryType {
     myString: String
-}"""
+}
+"""
             }
         }
         "QueryDslTest with args" should {
@@ -65,12 +65,12 @@ type QueryType {
                 } schemaEqual """
 schema {
     query: QueryType
-$TAB
 }
 
 type QueryType {
     string(string: String!): String!
-}"""
+}
+"""
             }
             "several args and config" {
                 schemaDsl {
@@ -81,12 +81,12 @@ type QueryType {
                 } schemaEqual """
 schema {
     query: QueryType
-$TAB
 }
 
 type QueryType {
     string(string: String, type: SimpleTypes!): String!
-}"""
+}
+"""
             }
             "Custom Query Name" {
                 schemaDsl {
@@ -104,13 +104,13 @@ type QueryType {
                 } schemaEqual """
 schema {
     query: QueryType
-$TAB
 }
 
 type QueryType {
     myQuery(string: String): String!
     secondQuery(type: SimpleTypes!, count: Int): String!
-}"""
+}
+"""
             }
         }
         "QueryDslTest List Type" should {
@@ -133,13 +133,13 @@ type QueryType {
                 } schemaEqual """
 schema {
     query: QueryType
-$TAB
 }
 
 type QueryType {
     myQuery: [String]!
     myQuery2: [String]
-}"""
+}
+"""
             }
         }
     }

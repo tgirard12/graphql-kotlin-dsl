@@ -18,6 +18,7 @@ class SchemaDsl internal constructor() {
 
     companion object {
         private const val TAB = "    "
+        private const val NLINE = "\n"
     }
 
     fun graphQLSchema(runtimeWiring: RuntimeWiring): GraphQLSchema =
@@ -33,41 +34,71 @@ class SchemaDsl internal constructor() {
 
 
     fun schemaString() = """
-schema {
-    ${if (queries.isNotEmpty()) "query: QueryType" else ""}
-    ${if (mutations.isNotEmpty()) "mutation: MutationType" else ""}
+schema {${queries.queryType()}${mutations.mutationType()}
 }
+""" + queries.queriesString() + mutations.mutationsString() + scalars.schemaScalar() + enums.schemaEnums() + types.schemaTypes()
 
-${if (scalars.isNotEmpty()) scalars.sortedBy { it.name }.joinToString("\n") { it.schemaString() } else ""}
 
-    ${if (queries.isNotEmpty())
-        """type QueryType {
-${queries.sortedBy { it.name }.joinToString("\n") { it.schemaString() }}
+    private fun <T> List<T>.joinSchemaString(f: (T) -> String): String = this.joinToString(separator = NLINE, transform = f)
+
+    private fun List<TypeDsl>.schemaTypes() = when {
+        isNotEmpty() -> NLINE + types.sortedBy { it.name }.joinSchemaString { it.schemaString() }
+        else -> ""
+    }
+
+    private fun TypeDsl.schemaString() = """type $name {
+${fields.sortedBy { it.name }.joinToString(NLINE) { TAB + it.schemaString() }}
 }
- """
-    else ""}
-${if (mutations.isNotEmpty())
-        """type MutationType {
-${mutations.sortedBy { it.name }.joinToString("\n") { it.schemaString() }}
+"""
+
+    private fun List<EnumDsl>.schemaEnums() = when {
+        isNotEmpty() -> NLINE + enums.sortedBy { it.name }.joinSchemaString { it.schemaString() }
+        else -> ""
+    }
+
+    private fun EnumDsl.schemaString() = """enum $name {
+${fields.joinToString(NLINE) { TAB + it.name }}
 }
- """
-    else ""}
-${enums.sortedBy { it.name }.joinToString { it.schemaString() }}
-${types.sortedBy { it.name }.joinToString { it.schemaString() }}
-""".trimEnd()
+"""
 
-    private fun TypeDsl.schemaString() = """
-type $name {
-${fields.sortedBy { it.name }.joinToString("\n") { TAB + it.schemaString() }}
-}""".trim()
 
-    private fun EnumDsl.schemaString() = """
-enum $name {
-${fields.joinToString("\n") { TAB + it.name }}
-}""".trim()
+    private fun List<ScalarDsl>.schemaScalar() = when {
+        isNotEmpty() -> """
+${scalars.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
+"""
+        else -> ""
+    }
 
     private fun ScalarDsl.schemaString() = """scalar $name"""
     private fun TypeDsl.Field.schemaString() = """$name: $type${if (!nullable) "!" else ""}"""
+
+    private fun List<QueryDsl>.queryType() = when {
+        isNotEmpty() -> "$NLINE${TAB}query: QueryType"
+        else -> ""
+    }
+
+    private fun List<QueryDsl>.queriesString() = when {
+        isNotEmpty() -> """
+type QueryType {
+${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
+}
+"""
+        else -> ""
+    }
+
+    private fun List<MutationDsl>.mutationType() = when {
+        isNotEmpty() -> "$NLINE${TAB}mutation: MutationType"
+        else -> ""
+    }
+
+    private fun List<MutationDsl>.mutationsString() = when {
+        isNotEmpty() -> """
+type MutationType {
+${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
+}
+"""
+        else -> ""
+    }
 
     private fun ActionDsl.schemaString() = """$TAB$name${if (args.isNotEmpty()) {
         "(${args.joinToString { it.schemaString() }})"

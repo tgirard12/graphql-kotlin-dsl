@@ -17,11 +17,10 @@ class ScalarDslTest : WordSpec() {
                     scalar<Double>()
                 } schemaEqual """
 schema {
-$TAB
-$TAB
 }
 
-scalar Double"""
+scalar Double
+"""
             }
             "print several with names" {
                 schemaDsl {
@@ -30,13 +29,12 @@ scalar Double"""
                     scalar<LocalDateTime>()
                 } schemaEqual """
 schema {
-$TAB
-$TAB
 }
 
 scalar Double
 scalar LocalDateTime
-scalar UUID"""
+scalar UUID
+"""
             }
         }
     }
