@@ -1,5 +1,7 @@
 # graphql-kotlin-dsl
 
+[ ![Download](https://api.bintray.com/packages/tgirard12/kotlin/graphql-kotlin-dsl/images/download.svg) ](https://bintray.com/tgirard12/kotlin/graphql-kotlin-dsl/_latestVersion)
+
 Kotlin DSL to generate GraphQL Schema
 
 - Use a DSL to easily generate your GraphQL Schema (IDL)
