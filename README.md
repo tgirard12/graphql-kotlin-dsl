@@ -8,6 +8,11 @@ Kotlin DSL to generate GraphQL Schema
 - Generate a GraphQLSchema with the graphql-java library
 - Kotlin DSL to define custom scalars
 
+## Download
+
+```
+compile 'com.tgirard12:graphql-kotlin-dsl:VERSION'
+```
 
 ## GraphQLSchema
 
