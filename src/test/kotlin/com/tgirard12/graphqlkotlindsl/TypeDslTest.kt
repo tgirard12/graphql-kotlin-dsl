@@ -29,6 +29,7 @@ type SimpleTypes {
     longNull: Long
     string: String!
     stringNull: String
+    user: User!
     uuid: UUID!
     uuidNull: UUID
 }

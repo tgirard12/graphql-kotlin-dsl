@@ -6,6 +6,7 @@ import com.tgirard12.graphqlkotlindsl.graphqljava.graphQLSchema
 import com.tgirard12.graphqlkotlindsl.models.ListTypes
 import com.tgirard12.graphqlkotlindsl.models.SimpleEnum
 import com.tgirard12.graphqlkotlindsl.models.SimpleTypes
+import com.tgirard12.graphqlkotlindsl.models.User
 import graphql.Scalars
 import graphql.schema.CoercingSerializeException
 import graphql.schema.idl.RuntimeWiring
@@ -33,6 +34,7 @@ class SchemaDslTest : WordSpec() {
                     // Types
                     type<SimpleTypes> { }
                     type<ListTypes> { }
+                    type<User> { }
 
                     // Enum
                     enum<SimpleEnum> { }
@@ -144,8 +146,14 @@ type SimpleTypes {
     longNull: Long
     string: String!
     stringNull: String
+    user: User!
     uuid: UUID!
     uuidNull: UUID
+}
+
+type User {
+    email: String!
+    name: String!
 }
 
 """.trimIndent()
@@ -174,7 +182,6 @@ type SimpleTypes {
                     )
                 }
             }
-
             "with empty schema" {
                 schemaDsl { } schemaEqual """
 schema {

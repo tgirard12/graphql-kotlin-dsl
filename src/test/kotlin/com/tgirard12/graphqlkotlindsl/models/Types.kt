@@ -14,7 +14,8 @@ data class SimpleTypes(
         val string: String,
         val stringNull: String?,
         val uuid: UUID,
-        val uuidNull: UUID?
+        val uuidNull: UUID?,
+        val user: User
 )
 
 data class ListTypes(
@@ -24,4 +25,13 @@ data class ListTypes(
 
 enum class SimpleEnum {
     val1, VAL_2, `enum`
+}
+
+data class User(
+        val name: String,
+        val email: String
+)
+
+enum class Right {
+    read, write, execute
 }
