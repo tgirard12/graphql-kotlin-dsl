@@ -2,6 +2,7 @@ package com.tgirard12.graphqlkotlindsl.graphqljava
 
 import com.tgirard12.graphqlkotlindsl.SchemaDsl
 import com.tgirard12.graphqlkotlindsl.gqlName
+import graphql.GraphQL
 import graphql.schema.Coercing
 import graphql.schema.GraphQLScalarType
 import graphql.schema.GraphQLSchema
@@ -36,3 +37,10 @@ fun SchemaDsl.graphQLSchema(runtimeWiring: RuntimeWiring): GraphQLSchema =
         SchemaParser().parse(schemaString()).let { typeRegistry ->
             SchemaGenerator().makeExecutableSchema(typeRegistry, runtimeWiring)
         }
+
+fun SchemaDsl.graphQL(runtimeWiring: RuntimeWiring): GraphQL =
+        GraphQL.newGraphQL(
+                SchemaParser().parse(schemaString()).let { typeRegistry ->
+                    SchemaGenerator().makeExecutableSchema(typeRegistry, runtimeWiring)
+                }
+        ).build()
