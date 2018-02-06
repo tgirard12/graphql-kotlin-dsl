@@ -1,5 +1,6 @@
 package com.tgirard12.graphqlkotlindsl.graphqljava
 
+import graphql.language.StringValue
 import graphql.schema.CoercingSerializeException
 import java.util.*
 
@@ -11,21 +12,21 @@ class GqlJavaScalars {
             GqlJavaExtentions.scalarTypeDsl<UUID> {
                 parseLiteral {
                     when (it) {
-                        is String -> UUID.fromString(it)
+                        is StringValue -> UUID.fromString(it.value)
                         else -> null
                     }
                 }
                 parseValue {
                     when (it) {
                         is String -> UUID.fromString(it)
-                        else -> throw CoercingSerializeException("parseValue expected type 'UUID' " +
+                        else -> throw CoercingSerializeException("parseValue expected type UUID " +
                                 "but was ${it?.javaClass?.simpleName ?: "NULL"}")
                     }
                 }
                 serialize {
                     when (it) {
-                        is String -> it.toString()
-                        else -> throw CoercingSerializeException("serialize expected type 'UUID' " +
+                        is UUID -> it.toString()
+                        else -> throw CoercingSerializeException("serialize expected type UUID " +
                                 "but was ${it?.javaClass?.simpleName ?: "NULL"}")
                     }
                 }
