@@ -15,7 +15,7 @@ data class SimpleTypes(
         val stringNull: String?,
         val uuid: UUID,
         val uuidNull: UUID?,
-        val user: User
+        val user: User?
 )
 
 data class ListTypes(

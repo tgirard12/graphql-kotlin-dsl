@@ -113,7 +113,7 @@ type MutationType {
     double: Double!
     float: Float
     id: UUID!
-    long: Long
+    long: Long!
     now: LocalDateTime!
     simpleEnum: SimpleEnum!
     simpleTypes(long: Long!, double: Double!, simpleEnum: SimpleEnum): SimpleTypes!
@@ -146,13 +146,14 @@ type SimpleTypes {
     longNull: Long
     string: String!
     stringNull: String
-    user: User!
+    user: User
     uuid: UUID!
     uuidNull: UUID
 }
 
 type User {
     email: String!
+    id: UUID!
     name: String!
 }
 

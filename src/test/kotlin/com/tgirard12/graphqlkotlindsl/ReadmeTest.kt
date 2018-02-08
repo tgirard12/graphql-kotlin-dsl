@@ -67,6 +67,7 @@ enum Right {
 
 type User {
     email: String!
+    id: UUID!
     name: String!
 }
 """
