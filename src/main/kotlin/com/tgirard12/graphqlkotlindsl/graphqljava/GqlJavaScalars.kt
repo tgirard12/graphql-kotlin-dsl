@@ -1,5 +1,6 @@
 package com.tgirard12.graphqlkotlindsl.graphqljava
 
+import graphql.Scalars
 import graphql.language.StringValue
 import graphql.schema.CoercingSerializeException
 import java.util.*
@@ -31,6 +32,10 @@ class GqlJavaScalars {
                     }
                 }
             }
+        }
+
+        val double by lazy {
+            GqlJavaExtentions.scalarTypeDsl<Double>(Scalars.GraphQLFloat.coercing) { }
         }
     }
 }
