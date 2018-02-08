@@ -101,9 +101,7 @@ class ExecutionTest : WordSpec() {
             }
         }
         type<SimpleTypes> {
-            asyncDataFetcher<User>("user") {
-                users[0]
-            }
+            asyncDataFetcher<User>("user") { users[0] }
         }
     }, {
         queryExecutionStrategy(AsyncExecutionStrategy())

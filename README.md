@@ -2,46 +2,23 @@
 
 [ ![Download](https://api.bintray.com/packages/tgirard12/kotlin/graphql-kotlin-dsl/images/download.svg) ](https://bintray.com/tgirard12/kotlin/graphql-kotlin-dsl/_latestVersion)
 
-Kotlin DSL to generate GraphQL Schema
+Kotlin DSL to generate GraphQL Schema IDL and DSL for [graphql-java](https://github.com/graphql-java/graphql-java) library
 
-- Use a DSL to easily generate your GraphQL Schema (IDL)
-- Generate a GraphQLSchema with the graphql-java library
-- Kotlin DSL to define custom scalars
+- [Kotlin DSL to GraphQL Schema (IDL)](#schema-idl)
+- Extensions for graphql-java library
+  * [GraphQL and RuntimeWiring](#graphql-and-runtimewiring-dsl)
+  * [GraphQLSchema](#graphqlschema-instance)
+  * [Scalar DSL](#scalar-dsl)
 
 ## Download
 
-```
+```gradle
 compile 'com.tgirard12:graphql-kotlin-dsl:VERSION'
 ```
 
-## GraphQLSchema
-
-```kotlin
-val schema: GraphQLSchema = schemaDsl {
-
-  // ... schema definition
-
-}.graphQLSchema(myRuntimeWiring)
-```
-
-## Scalar DSL
-
-```kotlin
-val scalar = scalarTypeDsl<LocalDateTime> {
-  serialize {
-    // ...
-  }
-  parseValue {
-    // ...
-  }
-  parseLiteral {
-    // ...
-  }
-}
-
-```
-
 ## Schema (IDL)
+
+[Show SchemaDsl sample](src/test/kotlin/com/tgirard12/graphqlkotlindsl/SchemaDslTest.kt#L25)
 
 ```kotlin
 data class User(
@@ -85,7 +62,7 @@ schemaDsl {
 }
 ```
 
-Generate this GraphQl schema :  
+Generate this GraphQl schema :
 
 ```
 schema {
@@ -116,3 +93,73 @@ type User {
     name: String!
 }
 ```
+
+
+## graphql-java Extension functions and DSL
+
+[Show graphQL sample](src/test/kotlin/com/tgirard12/graphqlkotlindsl/execution/ExecutionTest.kt#L39)
+
+### GraphQL and RuntimeWiring DSL
+
+```kotlin
+schemaDsl { 
+  ...
+}.graphQL({ // Define RuntimeWiring.Builder
+
+  scalarUUID()
+  scalarDouble()
+
+  queryType {
+    staticDataFetcher<List<User>>("users") { users }
+    asyncDataFetcher<User>("user") { e ->
+      e.arguments["id"]?.let { id ->
+        users.firstOrNull {
+          id == it.id
+        }
+      }
+    }
+  }
+  mutationType {
+    asyncDataFetcher("updateUser") { e ->
+      User(id = UUID.fromString("773b29ba-6b2b-49fe-8cb1-36134689c458"),
+        name = e.arguments["name"] as String? ?: "",
+        email = e.arguments["email"] as String)
+    }
+  }
+  type<SimpleTypes> {
+    asyncDataFetcher<User>("user") { users[0] } // Custom fetcher for SimpleTypes.user
+  }
+}, { GraphQL.Builder
+  queryExecutionStrategy(AsyncExecutionStrategy())
+})
+```
+
+### GraphQLSchema instance
+
+```kotlin
+schemaDsl { 
+  ...
+}.graphQLSchema(myRuntimeWiring)
+```
+
+### Scalar DSL
+
+```kotlin
+val scalar = scalarTypeDsl<LocalDateTime> {
+  serialize {
+    // ...
+  }
+  parseValue {
+    // ...
+  }
+  parseLiteral {
+    // ...
+  }
+}
+
+```
+[Show scalars sample](src/main/kotlin/com/tgirard12/graphqlkotlindsl/graphqljava/GqlJavaScalars.kt#L12)
+
+Custom scalars : `GqlJavaScalars.uuid`, `GqlJavaScalars.double`
+
+
