@@ -38,9 +38,11 @@ fun SchemaDsl.graphQLSchema(runtimeWiring: RuntimeWiring): GraphQLSchema =
             SchemaGenerator().makeExecutableSchema(typeRegistry, runtimeWiring)
         }
 
-fun SchemaDsl.graphQL(runtimeWiring: RuntimeWiring): GraphQL =
-        GraphQL.newGraphQL(
-                SchemaParser().parse(schemaString()).let { typeRegistry ->
-                    SchemaGenerator().makeExecutableSchema(typeRegistry, runtimeWiring)
-                }
-        ).build()
+fun SchemaDsl.graphQl(runtimeWiring: RuntimeWiring, f: GraphQL.Builder.() -> Unit): GraphQL = GraphQL.newGraphQL(
+        SchemaParser().parse(schemaString()).let { typeRegistry ->
+            SchemaGenerator().makeExecutableSchema(typeRegistry, runtimeWiring)
+        }
+).apply { f() }.build()
+
+fun SchemaDsl.graphQL(r: RuntimeWiring.Builder.() -> Unit, g: GraphQL.Builder.() -> Unit): GraphQL =
+        graphQl(GqlJavaRuntimeWiringDsl.newRuntimeWiring(r), g)
