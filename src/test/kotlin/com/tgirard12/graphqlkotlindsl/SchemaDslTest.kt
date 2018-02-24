@@ -32,8 +32,10 @@ class SchemaDslTest : WordSpec() {
                     scalar<LocalDateTime>()
 
                     // Types
-                    type<SimpleTypes> { }
-                    type<ListTypes> { }
+                    type<SimpleTypes>("Simple Types") { }
+                    type<ListTypes> {
+                        description = "List Types"
+                    }
                     type<User> { }
 
                     // Enum
@@ -142,11 +144,13 @@ enum SimpleEnum {
     enum
 }
 
+# List Types
 type ListTypes {
     ints: [Int]!
     intsNull: [Int]
 }
 
+# Simple Types
 type SimpleTypes {
     double: Double!
     doubleNull: Double

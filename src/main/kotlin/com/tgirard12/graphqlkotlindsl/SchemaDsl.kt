@@ -43,7 +43,7 @@ schema {${queries.queryType()}${mutations.mutationType()}
             |""".trimMargin()
     } ?: ""
 
-    private fun TypeDsl.schemaString() = """type $name {
+    private fun TypeDsl.schemaString() = """${descriptionString()}type $name {
 ${fields.sortedBy { it.name }.joinToString(NLINE) { TAB + it.schemaString() }}
 }
 """
@@ -66,7 +66,7 @@ ${scalars.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
         else -> ""
     }
 
-    private fun ScalarDsl.schemaString() = """scalar $name"""
+    private fun ScalarDsl.schemaString() = """${descriptionString()}scalar $name"""
     private fun TypeDsl.Field.schemaString() = """$name: $type${if (!nullable) "!" else ""}"""
 
     private fun List<QueryDsl>.queryType() = when {
@@ -107,14 +107,17 @@ ${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
     /*
      * DSL
      */
-    inline fun <reified T : Any> scalar(): Unit {
+    inline fun <reified T : Any> scalar(scalarDescription: String? = null): Unit {
         scalars += ScalarDsl().apply {
+            description = scalarDescription
             name = T::class.gqlName()
         }
     }
 
-    inline fun <reified T : Any> type(f: TypeDsl.() -> Unit): Unit {
+    inline fun <reified T : Any> type(typeDescription: String? = null,
+                                      f: TypeDsl.() -> Unit): Unit {
         types += TypeDsl().apply {
+            description = typeDescription
             f.invoke(this)
             name nullThen { name = T::class.gqlName() }
 

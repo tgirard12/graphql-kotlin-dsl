@@ -1,6 +1,6 @@
 package com.tgirard12.graphqlkotlindsl
 
-class ScalarDsl {
+class ScalarDsl : Description {
     var name: String? = null
-    var description: String? = null
+    override var description: String? = null
 }

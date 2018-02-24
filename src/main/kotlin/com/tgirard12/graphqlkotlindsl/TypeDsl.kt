@@ -1,16 +1,16 @@
 package com.tgirard12.graphqlkotlindsl
 
-class TypeDsl {
+class TypeDsl : Description {
     var name: String? = null
-    var description: String? = null
+    override var description: String? = null
 
     val fields = mutableListOf<Field>()
 
     data class Field(
             val name: String,
             val type: String,
-            val description: String,
+            override var description: String? = null,
             val enable: Boolean,
             val nullable: Boolean
-    )
+    ) : Description
 }
