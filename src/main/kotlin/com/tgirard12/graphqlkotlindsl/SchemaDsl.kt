@@ -37,6 +37,12 @@ schema {${queries.queryType()}${mutations.mutationType()}
         else -> ""
     }
 
+    private fun Description.descriptionString(prefix: String = "") = description?.let {
+        """
+            |$prefix# $description
+            |""".trimMargin()
+    } ?: ""
+
     private fun TypeDsl.schemaString() = """type $name {
 ${fields.sortedBy { it.name }.joinToString(NLINE) { TAB + it.schemaString() }}
 }
@@ -47,7 +53,7 @@ ${fields.sortedBy { it.name }.joinToString(NLINE) { TAB + it.schemaString() }}
         else -> ""
     }
 
-    private fun EnumDsl.schemaString() = """enum $name {
+    private fun EnumDsl.schemaString() = """${descriptionString()}enum $name {
 ${fields.joinToString(NLINE) { TAB + it.name }}
 }
 """
@@ -126,8 +132,10 @@ ${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
         }
     }
 
-    inline fun <reified T : Enum<T>> enum(f: EnumDsl.() -> Unit): Unit {
+    inline fun <reified T : Enum<T>> enum(enumDescription: String? = null,
+                                          f: EnumDsl.() -> Unit): Unit {
         enums += EnumDsl().apply {
+            description = enumDescription
             f.invoke(this)
             name nullThen { name = T::class.gqlName() }
 

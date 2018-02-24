@@ -1,8 +1,8 @@
 package com.tgirard12.graphqlkotlindsl
 
-class EnumDsl {
+class EnumDsl : Description {
     var name: String? = null
-    var description: String? = null
+    override var description: String? = null
 
     val fields = mutableListOf<Field>()
 
