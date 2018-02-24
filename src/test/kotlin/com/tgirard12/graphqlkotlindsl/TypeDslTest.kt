@@ -63,5 +63,42 @@ type ListTypes {
 """
             }
         }
+        "TypeDslTest.Field schema" should {
+            "fail if 2 has same name" {
+                shouldThrow<IllegalArgumentException> {
+                    schemaDsl {
+                        type<ListTypes> {
+                            desc("ints", "Ints descr 1")
+                            desc("ints", "Ints descr 2")
+                        }
+                    }
+                }.message shouldEqual "Description 'Ints descr 2' on type 'ListTypes.ints' does not exist"
+            }
+            "fail if field name not exist" {
+                shouldThrow<IllegalArgumentException> {
+                    schemaDsl {
+                        type<ListTypes> {
+                            desc("intNotExist", "Ints Not Exist")
+                        }
+                    }
+                }.message shouldEqual "Type 'ListTypes.intNotExist' does not exist"
+            }
+            "add description on field" {
+                schemaDsl {
+                    type<ListTypes> {
+                        desc("ints", "Ints description")
+                    }
+                } schemaEqual """
+schema {
+}
+
+type ListTypes {
+    # Ints description
+    ints: [Int]!
+    intsNull: [Int]
+}
+"""
+            }
+        }
     }
 }

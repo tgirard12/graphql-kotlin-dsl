@@ -44,7 +44,7 @@ schema {${queries.queryType()}${mutations.mutationType()}
     } ?: ""
 
     private fun TypeDsl.schemaString() = """${descriptionString()}type $name {
-${fields.sortedBy { it.name }.joinToString(NLINE) { TAB + it.schemaString() }}
+${fields.sortedBy { it.name }.joinToString(NLINE) { it.schemaString() }}
 }
 """
 
@@ -67,7 +67,7 @@ ${scalars.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
     }
 
     private fun ScalarDsl.schemaString() = """${descriptionString()}scalar $name"""
-    private fun TypeDsl.Field.schemaString() = """$name: $type${if (!nullable) "!" else ""}"""
+    private fun TypeDsl.Field.schemaString() = """${descriptionString(TAB)}$TAB$name: $type${if (!nullable) "!" else ""}"""
 
     private fun List<QueryDsl>.queryType() = when {
         isNotEmpty() -> "$NLINE${TAB}query: QueryType"
@@ -118,20 +118,36 @@ ${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
                                       f: TypeDsl.() -> Unit): Unit {
         types += TypeDsl().apply {
             description = typeDescription
+            name = T::class.gqlName()
             f.invoke(this)
-            name nullThen { name = T::class.gqlName() }
 
             T::class.gqlField()
                     .sortedBy { it.name }
                     .forEach {
+
+                        val cf = customFields.find { cf -> cf.name == it.name }
+
                         fields += TypeDsl.Field(
                                 name = it.name,
+                                description = cf?.description,
                                 enable = true,
                                 type = it.gqlType(),
                                 nullable = it.gqlNullable()
                         )
                     }
+
+            customFields.forEach { cf ->
+                if (!fields.any { it.name == cf.name })
+                    throw IllegalArgumentException("Type '$name.${cf.name}' does not exist")
+            }
         }
+    }
+
+    fun TypeDsl.desc(fieldName: String, description: String) {
+        if (customFields.any { it.name == fieldName })
+            throw IllegalArgumentException("Description '$description' on type '${this.name}.$fieldName' does not exist")
+
+        customFields.add(TypeDsl.Field(fieldName, "", description, false, true))
     }
 
     inline fun <reified T : Enum<T>> enum(enumDescription: String? = null,

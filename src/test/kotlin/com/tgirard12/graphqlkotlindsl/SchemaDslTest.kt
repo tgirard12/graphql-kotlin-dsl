@@ -34,6 +34,7 @@ class SchemaDslTest : WordSpec() {
                     // Types
                     type<SimpleTypes>("Simple Types") { }
                     type<ListTypes> {
+                        desc("ints", "Ints description")
                         description = "List Types"
                     }
                     type<User> { }
@@ -146,6 +147,7 @@ enum SimpleEnum {
 
 # List Types
 type ListTypes {
+    # Ints description
     ints: [Int]!
     intsNull: [Int]
 }

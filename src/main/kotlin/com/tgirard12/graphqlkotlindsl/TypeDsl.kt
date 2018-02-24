@@ -5,6 +5,7 @@ class TypeDsl : Description {
     override var description: String? = null
 
     val fields = mutableListOf<Field>()
+    val customFields = mutableListOf<Field>()
 
     data class Field(
             val name: String,
