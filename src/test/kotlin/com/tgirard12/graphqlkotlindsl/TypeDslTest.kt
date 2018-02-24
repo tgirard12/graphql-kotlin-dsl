@@ -48,6 +48,20 @@ type ListTypes {
 }
 """
             }
+            "print Description" {
+                schemaDsl {
+                    type<ListTypes>(typeDescription = "List Type") {}
+                } schemaEqual """
+schema {
+}
+
+# List Type
+type ListTypes {
+    ints: [Int]!
+    intsNull: [Int]
+}
+"""
+            }
         }
     }
 }

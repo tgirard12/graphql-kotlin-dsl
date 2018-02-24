@@ -22,10 +22,10 @@ schema {
 scalar Double
 """
             }
-            "print several with names" {
+            "print several with names and Description" {
                 schemaDsl {
                     scalar<Double>()
-                    scalar<UUID>()
+                    scalar<UUID>(scalarDescription = "The ID")
                     scalar<LocalDateTime>()
                 } schemaEqual """
 schema {
@@ -33,6 +33,7 @@ schema {
 
 scalar Double
 scalar LocalDateTime
+# The ID
 scalar UUID
 """
             }

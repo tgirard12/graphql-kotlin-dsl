@@ -19,7 +19,7 @@ class ReadmeTest : WordSpec() {
                     scalar<UUID>()
 
                     // Types and Enums
-                    type<User> { }
+                    type<User>(typeDescription = "An User") { }
                     enum<Right>(enumDescription = "An enum") { }
 
                     // Queries
@@ -70,6 +70,7 @@ enum Right {
     execute
 }
 
+# An User
 type User {
     email: String!
     id: UUID!
