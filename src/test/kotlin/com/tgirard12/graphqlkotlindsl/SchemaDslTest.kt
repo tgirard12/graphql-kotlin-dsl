@@ -36,6 +36,14 @@ class SchemaDslTest : WordSpec() {
                     type<ListTypes> {
                         desc("ints", "Ints description")
                         description = "List Types"
+
+                        addField<Int> {}
+                        addField<Long> {
+                            name = "countLong"
+                            description = "Long description"
+                            nullable = true
+                        }
+                        addField<String>(name = "stringField", description = "string decr") { }
                     }
                     type<User> { }
 
@@ -150,6 +158,12 @@ type ListTypes {
     # Ints description
     ints: [Int]!
     intsNull: [Int]
+
+    # Long description
+    countLong: Long
+    int: Int!
+    # string decr
+    stringField: String!
 }
 
 # Simple Types

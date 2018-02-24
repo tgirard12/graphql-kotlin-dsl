@@ -100,5 +100,34 @@ type ListTypes {
 """
             }
         }
+        "TypeDslTest addField schema" should {
+            "fail on exist Type" {
+                schemaDsl {
+                    type<ListTypes> {
+                        addField<Int> {}
+                        addField<Long> {
+                            name = "countLong"
+                            description = "Long description"
+                            nullable = true
+                        }
+                        addField<String>(name = "stringField", description = "string decr") { }
+                    }
+                } schemaEqual """
+schema {
+}
+
+type ListTypes {
+    ints: [Int]!
+    intsNull: [Int]
+
+    # Long description
+    countLong: Long
+    int: Int!
+    # string decr
+    stringField: String!
+}
+"""
+            }
+        }
     }
 }

@@ -5,13 +5,14 @@ class TypeDsl : Description {
     override var description: String? = null
 
     val fields = mutableListOf<Field>()
-    val customFields = mutableListOf<Field>()
+    val descriptions = mutableMapOf<String, String>()
+    val addFields = mutableListOf<Field>()
 
-    data class Field(
-            val name: String,
-            val type: String,
-            override var description: String? = null,
-            val enable: Boolean,
-            val nullable: Boolean
-    ) : Description
+    class Field : Description {
+        var name: String? = null
+        var type: String? = null
+        override var description: String? = null
+        var enable: Boolean = true
+        var nullable: Boolean = false
+    }
 }

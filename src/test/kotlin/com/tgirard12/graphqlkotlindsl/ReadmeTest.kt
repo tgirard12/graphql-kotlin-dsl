@@ -21,6 +21,12 @@ class ReadmeTest : WordSpec() {
                     // Types and Enums
                     type<User>(typeDescription = "An User") {
                         desc("email", "User Email")
+
+                        addField<String>(name = "otherName") { }
+                        addField<Right> {
+                            description = "User Right"
+                            nullable = true
+                        }
                     }
                     enum<Right>(enumDescription = "An enum") { }
 
@@ -78,6 +84,10 @@ type User {
     email: String!
     id: UUID!
     name: String!
+
+    otherName: String!
+    # User Right
+    right: Right
 }
 """
             }
