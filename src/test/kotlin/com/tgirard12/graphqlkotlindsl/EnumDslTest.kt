@@ -12,11 +12,22 @@ class EnumDslTest : WordSpec() {
         "EnumDslTest schema" should {
             "print enum" {
                 schemaDsl {
-                    enum<SimpleEnum> { }
+                    enum<SimpleEnum> {
+                        description = "An enum"
+                    }
+                    enum<SimpleEnum>(enumDescription = "My Description") { }
                 } schemaEqual """
 schema {
 }
 
+# An enum
+enum SimpleEnum {
+    val1
+    VAL_2
+    enum
+}
+
+# My Description
 enum SimpleEnum {
     val1
     VAL_2

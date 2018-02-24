@@ -20,7 +20,7 @@ class ReadmeTest : WordSpec() {
 
                     // Types and Enums
                     type<User> { }
-                    enum<Right> { }
+                    enum<Right>(enumDescription = "An enum") { }
 
                     // Queries
                     query<User> {
@@ -59,6 +59,7 @@ type MutationType {
 scalar Double
 scalar UUID
 
+# An enum
 enum Right {
     read
     write

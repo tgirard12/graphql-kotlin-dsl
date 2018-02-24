@@ -37,7 +37,7 @@ class SchemaDslTest : WordSpec() {
                     type<User> { }
 
                     // Enum
-                    enum<SimpleEnum> { }
+                    enum<SimpleEnum>(enumDescription = "An enum") { }
 
                     // Simple query
                     query<String> { }
@@ -124,6 +124,7 @@ scalar Double
 scalar LocalDateTime
 scalar UUID
 
+# An enum
 enum SimpleEnum {
     val1
     VAL_2
