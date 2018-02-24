@@ -43,10 +43,17 @@ schema {${queries.queryType()}${mutations.mutationType()}
             |""".trimMargin()
     } ?: ""
 
-    private fun TypeDsl.schemaString() = """${descriptionString()}type $name {
-${fields.sortedBy { it.name }.joinToString(NLINE) { it.schemaString() }}
-}
-"""
+    private fun TypeDsl.schemaString() = "${descriptionString()}type $name {$NLINE" +
+            fields.sortedBy { it.name }.joinToString(NLINE) { it.schemaString() } +
+            addFields.sortedBy { it.name }
+                    .joinToString(separator = NLINE) { it.schemaString() }
+                    .let {
+                        if (it.isBlank()) ""
+                        else NLINE + NLINE + it
+                    } +
+            NLINE +
+            "}" +
+            NLINE
 
     private fun List<EnumDsl>.schemaEnums() = when {
         isNotEmpty() -> NLINE + enums.sortedBy { it.name }.joinSchemaString { it.schemaString() }
@@ -125,29 +132,41 @@ ${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
                     .sortedBy { it.name }
                     .forEach {
 
-                        val cf = customFields.find { cf -> cf.name == it.name }
+                        val cf = descriptions[it.name]
 
-                        fields += TypeDsl.Field(
-                                name = it.name,
-                                description = cf?.description,
-                                enable = true,
-                                type = it.gqlType(),
-                                nullable = it.gqlNullable()
-                        )
+                        fields += TypeDsl.Field().apply {
+                            name = it.name
+                            description = cf
+                            enable = true
+                            type = it.gqlType()
+                            nullable = it.gqlNullable()
+                        }
                     }
 
-            customFields.forEach { cf ->
-                if (!fields.any { it.name == cf.name })
-                    throw IllegalArgumentException("Type '$name.${cf.name}' does not exist")
+            descriptions.forEach { cf ->
+                if (!fields.any { it.name == cf.key })
+                    throw IllegalArgumentException("Type '$name.${cf.key}' does not exist")
             }
         }
     }
 
     fun TypeDsl.desc(fieldName: String, description: String) {
-        if (customFields.any { it.name == fieldName })
+        if (descriptions.any { it.key == fieldName })
             throw IllegalArgumentException("Description '$description' on type '${this.name}.$fieldName' does not exist")
 
-        customFields.add(TypeDsl.Field(fieldName, "", description, false, true))
+        descriptions[fieldName] = description
+    }
+
+    inline fun <reified T : Any> TypeDsl.addField(name: String? = null,
+                                                  description: String? = null,
+                                                  f: TypeDsl.Field.() -> Unit): Unit {
+        addFields += TypeDsl.Field().apply {
+            this.name = name
+            this.name nullThen { this.name = T::class.gqlName()?.decapitalize() }
+            this.type = T::class.gqlName()
+            this.description = description
+            f.invoke(this)
+        }
     }
 
     inline fun <reified T : Enum<T>> enum(enumDescription: String? = null,
