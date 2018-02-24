@@ -41,12 +41,15 @@ class SchemaDslTest : WordSpec() {
 
                     // Simple query
                     query<String> { }
-                    query<Int> { name = "count" }
+                    query<Int>(queryDescription = "Number of element") { name = "count" }
                     query<Long> { }
                     query<Float> { returnTypeNullable = true }
                     query<Double> { }
                     query<UUID> { name = "id" }
-                    query<LocalDateTime> { name = "now" }
+                    query<LocalDateTime> {
+                        name = "now"
+                        description = "Current DateTime"
+                    }
 
                     // complex queries
                     query<Unit> {
@@ -72,15 +75,18 @@ class SchemaDslTest : WordSpec() {
 
                     // Mutations
                     mutation<String> { }
-                    mutation<Int> { name = "count" }
+                    mutation<Int>(mutationDescription = "Update count") { name = "count" }
                     mutation<Long> { returnType = "Long" }
                     mutation<Float> { returnTypeNullable = true }
                     mutation<Double> { }
-                    mutation<UUID> { name = "id" }
+                    mutation<UUID> {
+                        name = "id"
+                        description = "Update UUID"
+                    }
                     mutation<LocalDateTime> { name = "now" }
 
                     mutation<SimpleEnum> { }
-                    mutation<SimpleTypes> {
+                    mutation<SimpleTypes>(mutationDescription = "Update the SimpleType") {
                         arg<Long> { }
                         arg<Double> { }
                         arg<SimpleEnum> { nullable = true }
@@ -95,11 +101,13 @@ schema {
 }
 
 type QueryType {
+    # Number of element
     count: Int!
     double: Double!
     float: Float
     id: UUID!
     long: Long!
+    # Current DateTime
     now: LocalDateTime!
     simpleEnum: [SimpleEnum]!
     string: String!
@@ -109,13 +117,16 @@ type QueryType {
 }
 
 type MutationType {
+    # Update count
     count: Int!
     double: Double!
     float: Float
+    # Update UUID
     id: UUID!
     long: Long!
     now: LocalDateTime!
     simpleEnum: SimpleEnum!
+    # Update the SimpleType
     simpleTypes(long: Long!, double: Double!, simpleEnum: SimpleEnum): SimpleTypes!
     string: String!
 }

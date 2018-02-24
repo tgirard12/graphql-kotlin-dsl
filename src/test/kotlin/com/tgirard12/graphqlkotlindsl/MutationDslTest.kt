@@ -20,18 +20,23 @@ type MutationType {
 }
 """
             }
-            "print simple Type custom Name" {
+            "print simple Type custom Name and description" {
                 schemaDsl {
                     mutation<String> { }
-                    mutation<String>("myString") { }
-                    mutation<SimpleTypes> { name = "simpleTypes" }
+                    mutation<String>("myString", mutationDescription = "String mutation") { }
+                    mutation<SimpleTypes> {
+                        name = "simpleTypes"
+                        description = "Update a SimpleType"
+                    }
                 } schemaEqual """
 schema {
     mutation: MutationType
 }
 
 type MutationType {
+    # String mutation
     myString: String!
+    # Update a SimpleType
     simpleTypes: SimpleTypes!
     string: String!
 }

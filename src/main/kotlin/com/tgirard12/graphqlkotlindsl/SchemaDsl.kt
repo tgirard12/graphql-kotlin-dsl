@@ -97,7 +97,7 @@ ${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
         else -> ""
     }
 
-    private fun ActionDsl.schemaString() = """$TAB$name${if (args.isNotEmpty()) {
+    private fun ActionDsl.schemaString() = """${descriptionString(TAB)}$TAB$name${if (args.isNotEmpty()) {
         "(${args.joinToString { it.schemaString() }})"
     } else ""
     }: $returnType${if (!returnTypeNullable) "!" else ""}"""
@@ -123,7 +123,6 @@ ${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
                     .forEach {
                         fields += TypeDsl.Field(
                                 name = it.name,
-                                description = "",
                                 enable = true,
                                 type = it.gqlType(),
                                 nullable = it.gqlNullable()
@@ -148,7 +147,9 @@ ${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
         }
     }
 
-    inline fun <reified T : Any> query(queryName: String? = null, f: QueryDsl.() -> Unit): Unit {
+    inline fun <reified T : Any> query(queryName: String? = null,
+                                       queryDescription: String? = null,
+                                       f: QueryDsl.() -> Unit): Unit {
         queries += QueryDsl().apply {
             if (T::class.typeParameters.isNotEmpty())
                 throw IllegalArgumentException("""
@@ -159,6 +160,7 @@ ${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
                     |    returnTypeNullable = true  // not nullable by default
                     |}""".trimMargin())
 
+            description = queryDescription
             f.invoke(this)
             when {
                 queryName != null -> name = queryName
@@ -168,7 +170,9 @@ ${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
         }
     }
 
-    inline fun <reified T : Any> mutation(queryName: String? = null, f: MutationDsl.() -> Unit): Unit {
+    inline fun <reified T : Any> mutation(mutationName: String? = null,
+                                          mutationDescription: String? = null,
+                                          f: MutationDsl.() -> Unit): Unit {
         mutations += MutationDsl().apply {
             if (T::class.typeParameters.isNotEmpty())
                 throw IllegalArgumentException("""
@@ -179,16 +183,18 @@ ${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
                     |    returnTypeNullable = true  // not nullable by default
                     |}""".trimMargin())
 
+            description = mutationDescription
             f.invoke(this)
             when {
-                queryName != null -> name = queryName
+                mutationName != null -> name = mutationName
                 name == null -> name = T::class.gqlName()?.decapitalize()
             }
             returnType nullThen { returnType = T::class.gqlName() }
         }
     }
 
-    inline fun <reified T : Any?> ActionDsl.arg(argName: String? = null, f: ActionDsl.Arg.() -> Unit): Unit {
+    inline fun <reified T : Any?> ActionDsl.arg(argName: String? = null,
+                                                f: ActionDsl.Arg.() -> Unit): Unit {
         args += ActionDsl.Arg().apply {
             f.invoke(this)
 

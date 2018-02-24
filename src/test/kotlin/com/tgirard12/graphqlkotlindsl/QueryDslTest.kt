@@ -23,18 +23,23 @@ type QueryType {
 }
 """
             }
-            "print simple Type custom Name" {
+            "print simple Type custom Name and Description" {
                 schemaDsl {
                     query<String> { }
-                    query<String>("myString") { }
-                    query<SimpleTypes> { name = "simpleTypes" }
+                    query<String>("myString", "Query on String") { }
+                    query<SimpleTypes> {
+                        name = "simpleTypes"
+                        description = "One SimpleType"
+                    }
                 } schemaEqual """
 schema {
     query: QueryType
 }
 
 type QueryType {
+    # Query on String
     myString: String!
+    # One SimpleType
     simpleTypes: SimpleTypes!
     string: String!
 }
