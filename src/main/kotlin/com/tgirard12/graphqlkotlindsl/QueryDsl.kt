@@ -1,8 +1,8 @@
 package com.tgirard12.graphqlkotlindsl
 
-sealed class ActionDsl {
+sealed class ActionDsl : Description {
     var name: String? = null
-    var description: String? = null
+    override var description: String? = null
 
     var returnType: String? = null
     var returnTypeNullable: Boolean = false

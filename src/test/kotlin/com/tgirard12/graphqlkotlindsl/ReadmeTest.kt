@@ -23,16 +23,17 @@ class ReadmeTest : WordSpec() {
                     enum<Right>(enumDescription = "An enum") { }
 
                     // Queries
-                    query<User> {
+                    query<User>(queryDescription = "User By Id") {
                         arg<UUID> { name = "id" }
                     }
                     query<Unit> {
                         name = "users"
+                        description = "All Users"
                         returnType = "[User]"
                     }
 
                     // Mutations
-                    mutation<User> {
+                    mutation<User>(mutationDescription = "Update a user") {
                         name = "updateUser"
 
                         arg<Int> {
@@ -48,11 +49,14 @@ schema {
 }
 
 type QueryType {
+    # User By Id
     user(id: UUID!): User!
+    # All Users
     users: [User]!
 }
 
 type MutationType {
+    # Update a user
     updateUser(count: Int, name: String!): User!
 }
 
