@@ -7,6 +7,7 @@ class TypeDsl : Description {
     val fields = mutableListOf<Field>()
     val descriptions = mutableMapOf<String, String>()
     val addFields = mutableListOf<Field>()
+    val dropFields = mutableListOf<Field>()
 
     class Field : Description {
         var name: String? = null

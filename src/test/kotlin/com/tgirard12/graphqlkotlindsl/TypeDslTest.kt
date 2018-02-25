@@ -129,5 +129,30 @@ type ListTypes {
 """
             }
         }
+        "TypeDslTest dropField schema" should {
+            "not print drop field" {
+                schemaDsl {
+                    type<ListTypes> {
+                        dropField("intsNull")
+                    }
+                } schemaEqual """
+schema {
+}
+
+type ListTypes {
+    ints: [Int]!
+}
+"""
+            }
+            "throw if field name not exist" {
+                shouldThrow<IllegalArgumentException> {
+                    schemaDsl {
+                        type<ListTypes> {
+                            dropField("intsNotExist")
+                        }
+                    }
+                }
+            }
+        }
     }
 }

@@ -45,7 +45,9 @@ class SchemaDslTest : WordSpec() {
                         }
                         addField<String>(name = "stringField", description = "string decr") { }
                     }
-                    type<User> { }
+                    type<User> {
+                        dropField("deleteField")
+                    }
 
                     // Enum
                     enum<SimpleEnum>(enumDescription = "An enum") { }

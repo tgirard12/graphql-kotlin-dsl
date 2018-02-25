@@ -17,8 +17,8 @@ import java.util.*
 class ExecutionTest : WordSpec() {
 
     val users = listOf(
-            User(id = UUID.fromString("b6214ea0-fc5a-493c-91ea-939e17b2e95f"), name = "John", email = "john@mail.com"),
-            User(id = UUID.fromString("c682a4c5-e66b-4dbf-a077-d97579c308dc"), name = "Doe", email = "doe@mail.com")
+            User(id = UUID.fromString("b6214ea0-fc5a-493c-91ea-939e17b2e95f"), name = "John", email = "john@mail.com", deleteField = 1),
+            User(id = UUID.fromString("c682a4c5-e66b-4dbf-a077-d97579c308dc"), name = "Doe", email = "doe@mail.com", deleteField = 2)
     )
 
     val simpleTypes = listOf(
@@ -97,7 +97,8 @@ class ExecutionTest : WordSpec() {
             asyncDataFetcher("updateUser") { e ->
                 User(id = UUID.fromString("773b29ba-6b2b-49fe-8cb1-36134689c458"),
                         name = e.arguments["name"] as String? ?: "",
-                        email = e.arguments["email"] as String)
+                        email = e.arguments["email"] as String,
+                        deleteField = 2)
             }
         }
         type<SimpleTypes> {

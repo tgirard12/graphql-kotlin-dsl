@@ -44,7 +44,9 @@ schema {${queries.queryType()}${mutations.mutationType()}
     } ?: ""
 
     private fun TypeDsl.schemaString() = "${descriptionString()}type $name {$NLINE" +
-            fields.sortedBy { it.name }.joinToString(NLINE) { it.schemaString() } +
+            fields.filter { it.enable == true }
+                    .sortedBy { it.name }
+                    .joinToString(NLINE) { it.schemaString() } +
             addFields.sortedBy { it.name }
                     .joinToString(separator = NLINE) { it.schemaString() }
                     .let {
@@ -137,7 +139,7 @@ ${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
                         fields += TypeDsl.Field().apply {
                             name = it.name
                             description = cf
-                            enable = true
+                            enable = !dropFields.any { df -> df.name == it.name }
                             type = it.gqlType()
                             nullable = it.gqlNullable()
                         }
@@ -146,6 +148,10 @@ ${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
             descriptions.forEach { cf ->
                 if (!fields.any { it.name == cf.key })
                     throw IllegalArgumentException("Type '$name.${cf.key}' does not exist")
+            }
+            dropFields.forEach { df ->
+                if (!fields.any { it.name == df.name })
+                    throw IllegalArgumentException("Type '$name.${df.name}' does not exist")
             }
         }
     }
@@ -166,6 +172,12 @@ ${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
             this.type = T::class.gqlName()
             this.description = description
             f.invoke(this)
+        }
+    }
+
+    fun TypeDsl.dropField(name: String): Unit {
+        dropFields += TypeDsl.Field().apply {
+            this.name = name
         }
     }
 

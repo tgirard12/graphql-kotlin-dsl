@@ -27,6 +27,8 @@ class ReadmeTest : WordSpec() {
                             description = "User Right"
                             nullable = true
                         }
+
+                        dropField("deleteField")
                     }
                     enum<Right>(enumDescription = "An enum") { }
 
