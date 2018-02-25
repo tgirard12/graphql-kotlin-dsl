@@ -5,6 +5,8 @@
 Kotlin DSL to generate GraphQL Schema IDL and DSL for [graphql-java](https://github.com/graphql-java/graphql-java) library
 
 - [Kotlin DSL to GraphQL Schema (IDL)](#schema-idl)
+  * Add/remove field on any kotlin Class
+  * Add description on query, mutation, scalar, type, field and enum
 - Extensions for graphql-java library
   * [GraphQL and RuntimeWiring](#graphql-and-runtimewiring-dsl)
   * [GraphQLSchema](#graphqlschema-instance)
@@ -22,8 +24,9 @@ compile 'com.tgirard12:graphql-kotlin-dsl:VERSION'
 
 ```kotlin
 data class User(
-  val name: String, 
-  val email: String
+    val name: String, 
+    val email: String,
+    val deleteField: Int
 )
 
 enum class Right {
@@ -31,34 +34,45 @@ enum class Right {
 }
 
 schemaDsl {
- 
-  // Scalar
-  scalar<Double>()
-  scalar<UUID>()
 
-  // Types and Enums
-  type<User>()
-  enum<Right>
+    // Scalar
+    scalar<Double>()
+    scalar<UUID>()
 
-  // Queries
-  query<User> {
-    arg<UUID> { name = "id" }
-  }
-  query<Unit> {
-    name = "users"
-    returnType = "[User]"
-  }
+    // Types and Enums
+    type<User>(typeDescription = "An User") {
+        desc("email", "User Email")
 
-  // Mutations
-  mutation<User> {
-      name = "updateUser"
+        addField<String>(name = "otherName") { }
+        addField<Right> {
+            description = "User Right"
+            nullable = true
+        }
 
-      arg<Int> { 
-        name = "count"
-        nullable = true
-      }
-      arg<String> { name = "name" }
-  } 
+        dropField("deleteField")
+    }
+    enum<Right>(enumDescription = "An enum") { }
+
+    // Queries
+    query<User>(queryDescription = "User By Id") {
+        arg<UUID> { name = "id" }
+    }
+    query<Unit> {
+        name = "users"
+        description = "All Users"
+        returnType = "[User]"
+    }
+
+    // Mutations
+    mutation<User>(mutationDescription = "Update a user") {
+        name = "updateUser"
+
+        arg<Int> {
+            name = "count"
+            nullable = true
+        }
+        arg<String> { name = "name" }
+    }
 }
 ```
 
@@ -71,26 +85,37 @@ schema {
 }
 
 type QueryType {
+    # User By Id
     user(id: UUID!): User!
+    # All Users
     users: [User]!
 }
 
 type MutationType {
+    # Update a user
     updateUser(count: Int, name: String!): User!
 }
 
 scalar Double
 scalar UUID
 
+# An enum
 enum Right {
     read
     write
     execute
 }
 
+# An User
 type User {
+    # User Email
     email: String!
+    id: UUID!
     name: String!
+
+    otherName: String!
+    # User Right
+    right: Right
 }
 ```
 
