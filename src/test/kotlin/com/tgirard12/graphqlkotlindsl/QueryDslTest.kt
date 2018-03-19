@@ -1,9 +1,11 @@
 package com.tgirard12.graphqlkotlindsl
 
+import com.tgirard12.graphqlkotlindsl.graphqljava.asyncDataFetcher
 import com.tgirard12.graphqlkotlindsl.models.SimpleTypes
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.specs.WordSpec
 import org.junit.runner.RunWith
+import java.time.LocalDateTime
 
 @RunWith(KTestJUnitRunner::class)
 class QueryDslTest : WordSpec() {
@@ -145,6 +147,21 @@ type QueryType {
     myQuery2: [String]
 }
 """
+            }
+        }
+
+        "QueryDslTest dataFetcher" should {
+            "test datafetcher" {
+                schemaDsl {
+                    query<LocalDateTime> {
+                        asyncDataFetcher { LocalDateTime.now() }
+                    }
+                }.queries
+                        .first { it.name == "localDateTime" }
+                        .dataFetcher
+                        .let {
+                            (it != null) shouldEqual true
+                        }
             }
         }
     }

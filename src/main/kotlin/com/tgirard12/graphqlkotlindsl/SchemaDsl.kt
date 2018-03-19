@@ -2,6 +2,7 @@ package com.tgirard12.graphqlkotlindsl
 
 import com.tgirard12.graphqlkotlindsl.ActionDsl.MutationDsl
 import com.tgirard12.graphqlkotlindsl.ActionDsl.QueryDsl
+import graphql.schema.GraphQLScalarType
 import org.slf4j.LoggerFactory
 import kotlin.reflect.KClass
 import kotlin.reflect.KClassifier
@@ -116,10 +117,15 @@ ${this.sortedBy { it.name }.joinSchemaString { it.schemaString() }}
     /*
      * DSL
      */
-    inline fun <reified T : Any> scalar(scalarDescription: String? = null): Unit {
+    inline fun <reified T : Any> scalar(
+            scalarDescription: String? = null,
+            noinline f: (() -> GraphQLScalarType)? = null
+    ): Unit {
         scalars += ScalarDsl().apply {
             description = scalarDescription
             name = T::class.gqlName()
+
+            graphQlScalarType = f?.invoke()
         }
     }
 
@@ -275,4 +281,6 @@ fun <T : Any> KProperty1<out T, Any?>.gqlType(): String =
         }
 
 fun KClassifier?.gqlName(): String = (this as? KClass<*>)?.simpleName ?: "ERROR"
+fun KClassifier?.gqlNameDecapitalized(): String = gqlName().decapitalize()
+
 fun <T : Any> KProperty1<out T, Any?>.gqlNullable(): Boolean = returnType.isMarkedNullable

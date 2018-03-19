@@ -1,10 +1,14 @@
 package com.tgirard12.graphqlkotlindsl
 
+import Stubs
+import com.tgirard12.graphqlkotlindsl.graphqljava.asyncDataFetcher
+import com.tgirard12.graphqlkotlindsl.graphqljava.staticDataFetcher
 import com.tgirard12.graphqlkotlindsl.models.ListTypes
 import com.tgirard12.graphqlkotlindsl.models.SimpleTypes
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.specs.WordSpec
 import org.junit.runner.RunWith
+import java.time.LocalDateTime
 
 @RunWith(KTestJUnitRunner::class)
 class TypeDslTest : WordSpec() {
@@ -152,6 +156,25 @@ type ListTypes {
                         }
                     }
                 }
+            }
+        }
+        "TypeDslTest dataFetcher" should {
+            "test datafetcher" {
+                schemaDsl {
+                    type<SimpleTypes> {
+                        staticDataFetcher("user") {
+                            Stubs.users[0]
+                        }
+                        asyncDataFetcher { LocalDateTime.now() }
+                    }
+                }.types
+                        .first { it.name == "SimpleTypes" }
+                        .dataFetcher
+                        .let {
+                            it.size shouldEqual 2
+                            (it["user"] != null) shouldEqual true
+                            (it["localDateTime"] != null) shouldEqual true
+                        }
             }
         }
     }

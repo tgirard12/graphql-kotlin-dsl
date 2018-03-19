@@ -1,7 +1,9 @@
 package com.tgirard12.graphqlkotlindsl
 
+import com.tgirard12.graphqlkotlindsl.graphqljava.asyncDataFetcher
 import com.tgirard12.graphqlkotlindsl.models.SimpleTypes
 import io.kotlintest.specs.WordSpec
+import java.time.LocalDateTime
 
 class MutationDslTest : WordSpec() {
 
@@ -142,6 +144,21 @@ type MutationType {
     myMutation2: [String]
 }
 """
+            }
+        }
+
+        "MutationDslTest dataFetcher" should {
+            "test datafetcher" {
+                schemaDsl {
+                    mutation<LocalDateTime> {
+                        asyncDataFetcher { LocalDateTime.now() }
+                    }
+                }.mutations
+                        .first { it.name == "localDateTime" }
+                        .dataFetcher
+                        .let {
+                            (it != null) shouldEqual true
+                        }
             }
         }
     }

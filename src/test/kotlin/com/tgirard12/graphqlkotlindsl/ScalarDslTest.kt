@@ -1,5 +1,6 @@
 package com.tgirard12.graphqlkotlindsl
 
+import com.tgirard12.graphqlkotlindsl.graphqljava.GqlJavaScalars
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.specs.WordSpec
 import org.junit.runner.RunWith
@@ -36,6 +37,21 @@ scalar LocalDateTime
 # The ID
 scalar UUID
 """
+            }
+        }
+
+        "ScalarDslTest dataFetcher" should {
+            "test datafetcher" {
+                schemaDsl {
+                    scalar<Double> {
+                        GqlJavaScalars.double
+                    }
+                }.scalars
+                        .first { it.name == "Double" }
+                        .graphQlScalarType
+                        .let {
+                            (it != null) shouldEqual true
+                        }
             }
         }
     }
