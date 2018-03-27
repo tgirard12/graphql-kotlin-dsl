@@ -1,20 +1,25 @@
 = graphql-kotlin-dsl
 
 :sectanchors:
-:sectlinks:
 
 
 image::https://api.bintray.com/packages/tgirard12/kotlin/graphql-kotlin-dsl/images/download.svg[link="https://bintray.com/tgirard12/kotlin/graphql-kotlin-dsl/_latestVersion"]
 
-Kotlin DSL to generate GraphQL Schema IDL and DSL for [graphql-java](https://github.com/graphql-java/graphql-java) library
+Kotlin DSL to generate GraphQL Instance and Schema IDL for https://github.com/graphql-java/graphql-java
 
-- <<IDL, Kotlin DSL to GraphQL Schema (IDL))>>
-  * Add/remove field on any kotlin Class
-  * Add description on query, mutation, scalar, type, field and enum
-- Extensions for graphql-java library
-  * <<RuntimeWiring, GraphQL and RuntimeWiring>>
-  * <<GraphQLSchema>>
-  * <<Scalar, Scalar DSL>>
+- Use a Kotlin DSL to configure your schema :
+    ** query, mutation, type, enum
+    ** Add/remove field on any kotlin Class
+    ** Add descriptions
+
+- Add DataFetchers inside your DSL for :
+    ** query, mutation
+    ** Fields inside a type
+
+- Or just use extensions for graphql-java library
+    ** <<RuntimeWiring, GraphQL and RuntimeWiring>>
+    ** <<GraphQLSchema>>
+    ** <<Scalar, Scalar DSL>>
 
 == Download
 
@@ -23,10 +28,7 @@ Kotlin DSL to generate GraphQL Schema IDL and DSL for [graphql-java](https://git
 compile 'com.tgirard12:graphql-kotlin-dsl:VERSION'
 ----
 
-[[IDL]]
-== Schema (IDL)
-
-[Show SchemaDsl sample](src/test/kotlin/com/tgirard12/graphqlkotlindsl/SchemaDslTest.kt#L25)
+== Sample
 
 [source,kotlin]
 ----
@@ -41,19 +43,26 @@ enum class Right {
 }
 
 schemaDsl {
-
     // Scalar
-    scalar<Double>()
-    scalar<UUID>()
+    scalar<Double> { GqlJavaScalars.double }
+    scalar<UUID> { GqlJavaScalars.uuid }
 
     // Types and Enums
     type<User>(typeDescription = "An User") {
         desc("email", "User Email")
 
-        addField<String>(name = "otherName") { }
+        addField<String>(name = "otherName") {
+            asyncDataFetcher<String>("otherName") {
+                "MyOtherName"
+            }
+        }
+
         addField<Right> {
             description = "User Right"
             nullable = true
+            asyncDataFetcher<Right>("right") {
+                Right.execute
+            }
         }
 
         dropField("deleteField")
@@ -63,11 +72,19 @@ schemaDsl {
     // Queries
     query<User>(queryDescription = "User By Id") {
         arg<UUID> { name = "id" }
+
+        asyncDataFetcher { env ->
+            Stubs.users.firstOrNull { it.id == env.arguments["id"] }
+        }
     }
     query<Unit> {
         name = "users"
         description = "All Users"
         returnType = "[User]"
+
+        staticDataFetcher {
+            Stubs.users
+        }
     }
 
     // Mutations
@@ -79,13 +96,33 @@ schemaDsl {
             nullable = true
         }
         arg<String> { name = "name" }
+
+        asyncDataFetcher { env ->
+            User(UUID.randomUUID(), env.arguments["name"] as String, "email@gql.io", 5)
+        }
     }
-}
+}.graphQL {
+     queryExecutionStrategy(AsyncExecutionStrategy())
+
+}.execute("""
+    query user {
+       user(id: "b6214ea0-fc5a-493c-91ea-939e17b2e95f") {
+           id
+           email
+           name
+           otherName
+           right
+       }
+    }""")
 ----
 
-Generate this GraphQl schema :
+== How that work
 
-[source,IDL]
+:sectnums:
+
+*1. Generate this GraphQl String schema :*
+
+[source]
 ----
 schema {
     query: QueryType
@@ -127,13 +164,25 @@ type User {
 }
 ----
 
+*2. Use the DataFetcher from the DSL to generate RuntimeWiring :*
+
+- Load the String schema with `SchemaParser.parse()` and `SchemaGenerator.makeExecutableSchema()`
+- Create RuntimeWiring with `dataFetcher { ... }` DSL
+
+*3. Configure GraphQl.Builder()*
+
+- Use the DSL to configure `GraphQl.Builder()`
+
+:sectnums!:
+
+
 [[Extension]]
 == graphql-java Extension functions and DSL
 
 link:src/test/kotlin/com/tgirard12/graphqlkotlindsl/execution/ExecutionTest.kt#L39[Show graphQL sample]
 
 [[RuntimeWiring]]
-== GraphQL and RuntimeWiring DSL
+=== GraphQL and RuntimeWiring DSL
 
 [source,kotlin]
 ----
