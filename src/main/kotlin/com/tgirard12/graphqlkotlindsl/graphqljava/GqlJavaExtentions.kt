@@ -83,3 +83,42 @@ fun SchemaDsl.graphQl(runtimeWiring: RuntimeWiring, f: GraphQL.Builder.() -> Uni
 
 fun SchemaDsl.graphQL(r: RuntimeWiring.Builder.() -> Unit, g: GraphQL.Builder.() -> Unit): GraphQL =
         graphQl(GqlJavaRuntimeWiringDsl.newRuntimeWiring(r), g)
+
+fun SchemaDsl.graphQL(g: GraphQL.Builder.() -> Unit): GraphQL {
+    val schemaDsl = this
+
+    return graphQl(RuntimeWiring.newRuntimeWiring().apply {
+
+        if (schemaDsl.queries.isNotEmpty()) {
+            this.queryType {
+                schemaDsl.queries.forEach { query ->
+                    query.dataFetcher?.let { df ->
+                        dataFetcher(query.name, df)
+                    }
+                }
+            }
+        }
+        if (schemaDsl.mutations.isNotEmpty()) {
+            this.mutationType {
+                schemaDsl.mutations.forEach { mutation ->
+                    mutation.dataFetcher?.let { df ->
+                        dataFetcher(mutation.name, df)
+                    }
+                }
+            }
+        }
+        schemaDsl.scalars.forEach {
+            it.graphQlScalarType?.let {
+                scalar(it).build()
+            }
+        }
+        schemaDsl.types.forEach { type ->
+            this.type(TypeRuntimeWiring.newTypeWiring(type.name).apply {
+                type.dataFetcher.forEach { name, df ->
+                    dataFetcher(name, df)
+                }
+            }.build())
+        }
+    }.build(), g)
+}
+
