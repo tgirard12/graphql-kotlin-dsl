@@ -1,28 +1,35 @@
-# graphql-kotlin-dsl
+= graphql-kotlin-dsl
 
-[ ![Download](https://api.bintray.com/packages/tgirard12/kotlin/graphql-kotlin-dsl/images/download.svg) ](https://bintray.com/tgirard12/kotlin/graphql-kotlin-dsl/_latestVersion)
+:sectanchors:
+:sectlinks:
+
+
+image::https://api.bintray.com/packages/tgirard12/kotlin/graphql-kotlin-dsl/images/download.svg[link="https://bintray.com/tgirard12/kotlin/graphql-kotlin-dsl/_latestVersion"]
 
 Kotlin DSL to generate GraphQL Schema IDL and DSL for [graphql-java](https://github.com/graphql-java/graphql-java) library
 
-- [Kotlin DSL to GraphQL Schema (IDL)](#schema-idl)
+- <<IDL, Kotlin DSL to GraphQL Schema (IDL))>>
   * Add/remove field on any kotlin Class
   * Add description on query, mutation, scalar, type, field and enum
 - Extensions for graphql-java library
-  * [GraphQL and RuntimeWiring](#graphql-and-runtimewiring-dsl)
-  * [GraphQLSchema](#graphqlschema-instance)
-  * [Scalar DSL](#scalar-dsl)
+  * <<RuntimeWiring, GraphQL and RuntimeWiring>>
+  * <<GraphQLSchema>>
+  * <<Scalar, Scalar DSL>>
 
-## Download
+== Download
 
-```gradle
+[source,groovy]
+----
 compile 'com.tgirard12:graphql-kotlin-dsl:VERSION'
-```
+----
 
-## Schema (IDL)
+[[IDL]]
+== Schema (IDL)
 
 [Show SchemaDsl sample](src/test/kotlin/com/tgirard12/graphqlkotlindsl/SchemaDslTest.kt#L25)
 
-```kotlin
+[source,kotlin]
+----
 data class User(
     val name: String, 
     val email: String,
@@ -74,11 +81,12 @@ schemaDsl {
         arg<String> { name = "name" }
     }
 }
-```
+----
 
 Generate this GraphQl schema :
 
-```
+[source,IDL]
+----
 schema {
     query: QueryType
     mutation: MutationType
@@ -117,16 +125,18 @@ type User {
     # User Right
     right: Right
 }
-```
+----
 
+[[Extension]]
+== graphql-java Extension functions and DSL
 
-## graphql-java Extension functions and DSL
+link:src/test/kotlin/com/tgirard12/graphqlkotlindsl/execution/ExecutionTest.kt#L39[Show graphQL sample]
 
-[Show graphQL sample](src/test/kotlin/com/tgirard12/graphqlkotlindsl/execution/ExecutionTest.kt#L39)
+[[RuntimeWiring]]
+== GraphQL and RuntimeWiring DSL
 
-### GraphQL and RuntimeWiring DSL
-
-```kotlin
+[source,kotlin]
+----
 schemaDsl { 
   ...
 }.graphQL({ // Define RuntimeWiring.Builder
@@ -157,19 +167,23 @@ schemaDsl {
 }, { GraphQL.Builder
   queryExecutionStrategy(AsyncExecutionStrategy())
 })
-```
+----
 
-### GraphQLSchema instance
+[[GraphQLSchema]]
+=== GraphQLSchema instance
 
-```kotlin
+[source,kotlin]
+----
 schemaDsl { 
   ...
 }.graphQLSchema(myRuntimeWiring)
-```
+----
 
-### Scalar DSL
+[[Scalar]]
+=== Scalar DSL
 
-```kotlin
+[source,kotlin]
+----
 val scalar = scalarTypeDsl<LocalDateTime> {
   serialize {
     // ...
@@ -181,9 +195,9 @@ val scalar = scalarTypeDsl<LocalDateTime> {
     // ...
   }
 }
+----
 
-```
-[Show scalars sample](src/main/kotlin/com/tgirard12/graphqlkotlindsl/graphqljava/GqlJavaScalars.kt#L12)
+link:src/main/kotlin/com/tgirard12/graphqlkotlindsl/graphqljava/GqlJavaScalars.kt#L12[Show scalars sample]
 
 Custom scalars : `GqlJavaScalars.uuid`, `GqlJavaScalars.double`
 
